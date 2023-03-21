@@ -1,26 +1,18 @@
 import pyvisa
-import time
-import configparser
-from pathlib import Path
 
 class PowerSupply:
 
     def __init__(self):
         
-        # Find instrument
-        config_file_path = Path.cwd() / 'DC_setting.cfg'
-        config = configparser.ConfigParser()
-        config.read(config_file_path)
-        Port = config.get('DC_power' ,'Port')
-
         # Initialize PyVISA resource manager
         self.rm = pyvisa.ResourceManager()
+        self.GPIB = [value for value in self.rm.list_resources() if 'GPIB0::' in value]
         # Open the power supply
-        self.inst = self.rm.open_resource('%s'%Port)
+        self.inst = self.rm.open_resource(self.GPIB[0])
         # Set termination characters
         self.inst.read_termination = '\n'
         self.inst.write_termination = '\n'
-        self.data = []
+
 
     def __del__(self):
         # Close the instrument when the object is deleted
@@ -115,5 +107,3 @@ class PowerSupply:
         """
         return float(self.inst.query('MEASure:VOLTage:DC?'))
     
-
-
