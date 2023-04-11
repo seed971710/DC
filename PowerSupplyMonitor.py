@@ -1,11 +1,9 @@
 import configparser
 from pathlib import Path
 from PowerSupplyer import PowerSupply
-import csv
 import datetime
-import threading
 import time
-import pandas as pd
+from pandas import DataFrame , concat
 
 class Load_Config:
 
@@ -45,14 +43,14 @@ class PowerSupplyMonitor:
     def Measure(self):
 
         Test_interval =int(input( " 設定紀錄頻率：(次/秒) " ))
-        self.DataFrame = pd.DataFrame(columns=['Time (s)', 'Voltage (V)', 'Current (A)'])
+        self.DataFrame = DataFrame(columns=['Time (s)', 'Voltage (V)', 'Current (A)'])
         while True:
             self.measure_time = datetime.datetime.now().time()
             self.voltage = self.ps.read_voltage()
             self.current = self.ps.read_current()      
             self.data = {'Time (s)': self.measure_time, 'Voltage (V)': self.voltage, 'Current (A)': self.current}
-            print(f"'Time (s)': {self.measure_time} Voltage (V): {self.voltage:.4f}, Current (A): {self.current:.4f}")
-            self.DataFrame = pd.concat([self.DataFrame, pd.DataFrame([self.data])], ignore_index=True)
+            print(f"Time (s): {self.measure_time} Voltage (V): {self.voltage:.4f}, Current (A): {self.current:.4f}")
+            self.DataFrame = concat([self.DataFrame, DataFrame([self.data])], ignore_index=True)
             time.sleep(1/Test_interval)
 
 
@@ -69,6 +67,7 @@ if __name__ == '__main__':
 
     LC=Load_Config()
     print(LC.__enter__())
+
 
     PSM=PowerSupplyMonitor()
     PSM.start()
